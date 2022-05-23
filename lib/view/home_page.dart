@@ -1,34 +1,60 @@
 import 'package:data_management/view/edit_page.dart';
-import 'package:data_management/viewModel/view_models.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final todos = ref.watch(sortedTodosProvider);
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<String> wordList = [];
+
+  void _getWordList() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final wordList = prefs.getStringList("wordList");
+  }
+
+  @override
+  void initState() {
+    _getWordList();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Todoリスト"),
-        centerTitle: true,
       ),
       body: ListView.builder(
-        itemCount: todos.length,
-        itemBuilder: (context, int index) {
-          return Card(
-            child: ListTile(
-              leading: const Icon(Icons.check),
-              title: Text(todos[index].todo),
-            ),
-          );
-        },
-      ),
+          itemCount: wordList.length,
+          itemBuilder: (context, int index) {
+            return Card(
+              elevation: 15,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: ListTile(
+                leading: const Icon(Icons.message),
+                title: Text(wordList[index]),
+              ),
+            );
+          }),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (_) => EditScreen()));
-        },
         child: const Icon(Icons.add),
+        onPressed: () async {
+          await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => EditPage(
+                  wordList: wordList,
+                ),
+              ));
+          setState((){});
+        },
       ),
     );
   }
