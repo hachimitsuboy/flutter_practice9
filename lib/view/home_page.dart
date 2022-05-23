@@ -10,13 +10,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<String> wordList = [];
+  List<String>? wordList = [];
 
   void _getWordList() async {
     final prefs = await SharedPreferences.getInstance();
 
-    final wordList = prefs.getStringList("wordList");
+    setState((){
+      wordList = prefs.getStringList("wordList");
+    });
   }
+
 
   @override
   void initState() {
@@ -28,9 +31,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text("単語帳"),
+        centerTitle: true,
       ),
       body: ListView.builder(
-          itemCount: wordList.length,
+          itemCount: wordList!.length,
           itemBuilder: (context, int index) {
             return Card(
               elevation: 15,
@@ -39,7 +44,7 @@ class _HomePageState extends State<HomePage> {
               ),
               child: ListTile(
                 leading: const Icon(Icons.message),
-                title: Text(wordList[index]),
+                title: Text(wordList![index]),
               ),
             );
           }),
@@ -50,7 +55,7 @@ class _HomePageState extends State<HomePage> {
               context,
               MaterialPageRoute(
                 builder: (_) => EditPage(
-                  wordList: wordList,
+                  wordList: wordList!,
                 ),
               ));
           setState((){});
